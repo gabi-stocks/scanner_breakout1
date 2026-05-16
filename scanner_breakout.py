@@ -172,7 +172,7 @@ def run_pro_scanner():
     </body>
     </html>
     """
-    with open("breakout.html", "w", encoding="utf-8") as f:
+    with open("index.html", "w", encoding="utf-8") as f:
         f.write(full_html)
     print("Breakout scan completed!")
 
