@@ -44,7 +44,7 @@ jobs:
           git stash pop || echo "No changes to pop"
           
           # שימו לב: מוסיפים רק את קובץ ה-HTML החדש
-          git add breakout.html
+          git add index.html
           git commit -m "Automated Pro Breakout update" || echo "No changes to commit"
           git push origin main
 
