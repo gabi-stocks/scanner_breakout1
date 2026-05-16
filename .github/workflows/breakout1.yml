@@ -1,0 +1,58 @@
+name: Pro Breakout Scanner
+
+on:
+  workflow_dispatch:
+  schedule:
+    # רץ כל 30 דקות בין השעות 11:00 ל-20:00 ב-UTC, ימים שני-שישי
+    - cron: '*/30 11-20 * * 1-5'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5.1.1
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install yfinance pandas lxml html5lib requests numpy
+
+      - name: Run Breakout Scanner
+        run: python scanner_breakout.py
+
+      - name: Commit and Push Breakout Page
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git stash 
+          git pull --rebase origin main
+          git stash pop || echo "No changes to pop"
+          
+          # שימו לב: מוסיפים רק את קובץ ה-HTML החדש
+          git add breakout.html
+          git commit -m "Automated Pro Breakout update" || echo "No changes to commit"
+          git push origin main
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
